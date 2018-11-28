@@ -1,4 +1,5 @@
 import argparse
+import sys
 from random import shuffle
 import readchar
 import pandas as pd
@@ -11,8 +12,11 @@ parser.add_argument('-c', '--column', help='Specify name of column with names',
 args = parser.parse_args()
 data = args.file
 names = args.column
-
-df = pd.read_csv(data)
+try:
+    df = pd.read_csv(data)
+except FileNotFoundError:
+    print("Could not find file, exiting")
+    sys.exit()
 names = df[names]
 
 
@@ -56,19 +60,19 @@ def define_sex(names: list) -> dict:
 
 def randomize_tables(tables: dict) -> dict:
     people = define_sex(names)
-    (shuffle(v) for (k, v) in people.items())
-    try:
-        for table, size in tables.items():
-            tables[table] = []
-            for seat in range(size):
+    [shuffle(v) for (k, v) in people.items()]
+    for table, size in tables.items():
+        tables[table] = []
+        for seat in range(size):
+            try:
                 if seat % 2 is 0:
                     tables[table].append([people['men'].pop(0),
                                          people['women'].pop(0)])
                 else:
                     tables[table].append([people['women'].pop(0),
                                          people['men'].pop(0)])
-    except IndexError:
-        print('Out of people')
+            except IndexError:
+                print('Out of people')
 
     return tables
 
