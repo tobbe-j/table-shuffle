@@ -17,7 +17,11 @@ try:
 except FileNotFoundError:
     print("Could not find file, exiting")
     sys.exit()
-names = df[names]
+try:
+    names = df[names]
+except KeyError as ke:
+    print(f"Could not find column {ke.args}, exiting")
+    sys.exit()
 
 
 def get_tables():
