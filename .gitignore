@@ -1,0 +1,5 @@
+# pycache from running script
+__pycache__
+
+# Test data for development
+test-data.csv
