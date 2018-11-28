@@ -45,9 +45,11 @@ def define_sex(names: list, sexes: list) -> dict:
         people_s = list(zip(names, sexes))
         women = [x[0] for x in list(people_s) if x[1] is 'w']
         men = [x[0] for x in list(people_s) if x[1] is not 'w']
-        return {'men': men, 'women': women}
-    women = []
-    men = []
+        print(len(women) + len(men))
+        names = []
+    else:
+        women = []
+        men = []
     for name in names:
         print(f"Is {name} a man/Woman? (M/w) ")
         if readchar.readchar() is 'w':
@@ -71,17 +73,32 @@ def randomize_tables(tables: dict, sexes=None) -> dict:
     for table, size in tables.items():
         tables[table] = []
         for seat in range(size):
-            try:
-                if seat % 2 is 0:
-                    tables[table].append([people['men'].pop(0),
-                                         people['women'].pop(0)])
+            pair = []
+            if seat % 2 is 0:
+                if people['men']:
+                    pair.append(people['men'].pop(0))
                 else:
-                    tables[table].append([people['women'].pop(0),
-                                         people['men'].pop(0)])
-            except IndexError:
-                tables[table].extend([" ", " "])
+                    pair.append(' ')
+                if people['women']:
+                    pair.append(people['women'].pop(0))
+                else:
+                    pair.append(' ')
+            else:
+                if people['women']:
+                    pair.append(people['women'].pop(0))
+                else:
+                    pair.append(' ')
+                if people['men']:
+                    pair.append(people['men'].pop(0))
+                else:
+                    pair.append(' ')
+            tables[table].append(pair)
 
     return tables
+
+
+def add_friend(men: list, women: list, friend: str) -> None:
+    pass
 
 
 if __name__ == '__main__':
