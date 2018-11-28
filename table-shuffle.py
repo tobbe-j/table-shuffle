@@ -5,23 +5,17 @@ import readchar
 import pandas as pd
 from print_tables import print_tables
 
-parser = argparse.ArgumentParser(description='Seating order from csv')
-parser.add_argument('file', help='The csv file to read from')
-parser.add_argument('-c', '--column', help='Specify name of column with names',
-                    default='namn')
-args = parser.parse_args()
-data = args.file
-names = args.column
-try:
-    df = pd.read_csv(data)
-except FileNotFoundError:
-    print("Could not find file, exiting")
-    sys.exit()
-try:
-    names = df[names]
-except KeyError as ke:
-    print(f"Could not find column {ke.args}, exiting")
-    sys.exit()
+
+def getArgs(argvals=None):
+    parser = argparse.ArgumentParser(description='Seating order from csv')
+    parser.add_argument('file', help='The csv file to read from')
+    parser.add_argument('-c', '--column',
+                        help='Specify name of column with names',
+                        default='namn')
+    if argvals:
+        return parser.parse_args(argvals)
+    else:
+        return parser.parse_args()
 
 
 def get_tables():
@@ -77,9 +71,23 @@ def randomize_tables(tables: dict) -> dict:
                                          people['men'].pop(0)])
             except IndexError:
                 print('Out of people')
+                tables[table].extend([" ", " "])
 
     return tables
 
 
 if __name__ == '__main__':
+    args = getArgs()
+    data = args.file
+    names = args.column
+    try:
+        df = pd.read_csv(data)
+    except FileNotFoundError:
+        print("Could not find file, exiting")
+        sys.exit()
+    try:
+        names = df[names]
+    except KeyError as ke:
+        print(f"Could not find column {ke.args}, exiting")
+        sys.exit()
     print_tables(randomize_tables(get_tables()))

@@ -8,7 +8,7 @@ Empty tables will be the same size and have the word empty on them
 def print_tables(tables: dict) -> None:
     for name, table in tables.items():
         print(f"\n{' ' * 30}{name}\n\n")
-        if type(table) is int:
+        if len(table[0][0]) is 0:
             print("""                        +--------------+
                         |      E       |
                         |      M       |
@@ -20,12 +20,12 @@ def print_tables(tables: dict) -> None:
                   """)
             continue
 
-        for row in table:
-            if row is table[0]:
+        for idx, row in enumerate(table):
+            if idx is 0:
                 pad = 20 - len(row[0])
                 print(f"{' ' * pad}{row[0]}    +---------------+    {row[-1]}")
                 print(f"{' ' * 24}|{' ' * 15}|")
-            elif row is table[-1]:
+            elif idx is (len(table)-1):
                 pad = 20 - len(row[0])
                 print(f"{' ' * pad}{row[0]}    +---------------+    {row[-1]}")
                 print("\n\n\n")
