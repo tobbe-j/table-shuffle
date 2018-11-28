@@ -12,6 +12,10 @@ def getArgs(argvals=None):
     parser.add_argument('-c', '--column',
                         help='Specify name of column with names',
                         default='namn')
+    parser.add_argument('-s', '--sexes', help='column for the sexes')
+    parser.add_argument('-p', '--preference',
+                        help='seat preference, who this person'
+                        'wuold like to sit close to')
     if argvals:
         return parser.parse_args(argvals)
     else:
@@ -36,7 +40,12 @@ def get_tables():
     return tables
 
 
-def define_sex(names: list) -> dict:
+def define_sex(names: list, sexes: list) -> dict:
+    if sexes is not None:
+        people_s = list(zip(names, sexes))
+        women = [x[0] for x in list(people_s) if x[1] is 'w']
+        men = [x[0] for x in list(people_s) if x[1] is not 'w']
+        return {'men': men, 'women': women}
     women = []
     men = []
     for name in names:
@@ -56,8 +65,8 @@ def define_sex(names: list) -> dict:
     return {'men': men, 'women': women}
 
 
-def randomize_tables(tables: dict) -> dict:
-    people = define_sex(names)
+def randomize_tables(tables: dict, sexes=None) -> dict:
+    people = define_sex(names, sexes)
     [shuffle(v) for (k, v) in people.items()]
     for table, size in tables.items():
         tables[table] = []
@@ -70,7 +79,6 @@ def randomize_tables(tables: dict) -> dict:
                     tables[table].append([people['women'].pop(0),
                                          people['men'].pop(0)])
             except IndexError:
-                print('Out of people')
                 tables[table].extend([" ", " "])
 
     return tables
@@ -80,6 +88,12 @@ if __name__ == '__main__':
     args = getArgs()
     data = args.file
     names = args.column
+    if args.sexes is None:
+        sexes = None
+    else:
+        sexes = args.sexes
+
+    preference = args.preference
     try:
         df = pd.read_csv(data)
     except FileNotFoundError:
@@ -87,7 +101,9 @@ if __name__ == '__main__':
         sys.exit()
     try:
         names = df[names]
+        if sexes is not None:
+            sexes = df[sexes]
     except KeyError as ke:
         print(f"Could not find column {ke.args}, exiting")
         sys.exit()
-    print_tables(randomize_tables(get_tables()))
+    print_tables(randomize_tables(get_tables(), sexes))
