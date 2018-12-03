@@ -60,10 +60,14 @@ def get_tables():
 def balance_sex(men: list, women: list):
     if len(men) > len(women):
         difference = (len(men) - len(women)) // 2
+        for m in men[-difference:]:
+            m.sex = 'w'
         women.extend(men[-difference:])
         del men[-difference:]
     elif len(women) > len(men):
         difference = len(women) - len(men)
+        for w in women[-difference:]:
+            w.sex = 'm'
         men.extend(women[-difference:])
         del women[-difference:]
     return [men, women]
@@ -111,16 +115,26 @@ def add_friend(men: list, women: list, host: tuple) -> None:
         host_index = swap_list.index(host)
         friend_index = swap_list.index(friend)
         if host_index + 1 < len(swap_list):
-            print(f"Moving {friend.name} to place {host_index + 1} where now"
-                  f"sits {swap_list[host_index + 1].name}")
             (swap_list[friend_index],
              swap_list[host_index + 1]) = (swap_list[host_index + 1],
                                            swap_list[friend_index])
         else:
-            print(f"Moving {friend.name} to place {host_index + 1}")
             (swap_list[friend_index],
              swap_list[host_index - 1]) = (swap_list[host_index - 1],
                                            swap_list[friend_index])
+    else:
+        if host.sex is 'm':
+            host_list = men
+            other_list = women
+        else:
+            host_list = women
+            other_list = men
+        host_index = host_list.index(host)
+        friend_index = other_list.index(friend)
+        (other_list[friend_index],
+         other_list[host_index]) = (other_list[host_index],
+                                    other_list[friend_index])
+
     print(men + women)
 
 
