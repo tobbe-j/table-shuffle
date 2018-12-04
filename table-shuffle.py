@@ -1,6 +1,6 @@
 import argparse
 import sys
-from random import shuffle
+import random
 import pandas as pd
 from itertools import zip_longest
 from save_table import save_tables
@@ -64,8 +64,11 @@ def randomize_tables(tables: dict, people: list) -> dict:
     for item in people:
         (men if item.sex is 'm' else women).append(item)
     balance_sex(men, women)
-    shuffle(men)
-    shuffle(women)
+    print(f"Random seed used: {list(tables.keys())[0]},"
+          f" use same number to get same shuffle")
+    random.seed(list(tables.keys())[0])
+    random.shuffle(men)
+    random.shuffle(women)
     for person in people:
         if person.preference is not None:
             add_friend(men, women, person)
