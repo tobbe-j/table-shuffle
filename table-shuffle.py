@@ -3,6 +3,7 @@ import sys
 from random import shuffle
 import pandas as pd
 from itertools import zip_longest
+from save_table import save_tables
 from print_tables import print_tables, print_person_table_list, print_allergies
 from person import Person, Empty
 
@@ -102,7 +103,7 @@ def add_friend(men: list, women: list, host: Person) -> None:
             swap_list = women
         host_index = swap_list.index(host)
         friend_index = swap_list.index(friend)
-        if host_index + 1 < len(swap_list):
+        if host_index + 2 < len(swap_list):
             (swap_list[friend_index],
              swap_list[host_index + 1]) = (swap_list[host_index + 1],
                                            swap_list[friend_index])
@@ -157,6 +158,7 @@ if __name__ == '__main__':
 print_table -- print tables to console
 print_list -- print list of which person sits in which table
 print_allergies -- prints list of all peolpe with alleriges
+save_table -- save tables as a pdf
 exit -- exit script
 
  """)
@@ -166,6 +168,8 @@ exit -- exit script
             print_person_table_list(tables)
         elif outputstyle == 'print_allergies':
             print_allergies(tables)
+        elif outputstyle == 'save_table':
+            save_tables(tables)
         elif outputstyle == '' or outputstyle == 'exit':
             print("Exiting...")
             sys.exit()
