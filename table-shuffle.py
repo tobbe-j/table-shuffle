@@ -3,7 +3,7 @@ import sys
 from random import shuffle
 import pandas as pd
 from itertools import zip_longest
-from print_tables import print_tables
+from print_tables import print_tables, print_person_table_list, print_allergies
 from person import Person, Empty
 
 
@@ -17,6 +17,7 @@ def getArgs(argvals=None):
     parser.add_argument('-p', '--preference',
                         help='seat preference, who this person'
                         'wuold like to sit close to')
+    parser.add_argument('-a', '--allergies', help='column for allergies')
     if argvals:
         return parser.parse_args(argvals)
     else:
@@ -41,22 +42,6 @@ def get_tables():
     return tables
 
 
-# def define_sex(names: list, sexes: list) -> list:
-#     if sexes is not None:
-#         people_s = list(zip(names, sexes))
-#         women = [x[0] for x in list(people_s) if x[1] is 'w']
-#         men = [x[0] for x in list(people_s) if x[1] is not 'w']
-#         print(len(women) + len(men))
-#         names = []
-#     else:
-#         women = []
-#         men = []
-#     for name in names:
-#         print(f"Is {name} a man/Woman? (M/w) ")
-#         if readchar.readchar() is 'w':
-#             women.append(name)
-#         else:
-#             men.append(name)
 def balance_sex(men: list, women: list):
     if len(men) > len(women):
         difference = (len(men) - len(women)) // 2
@@ -95,18 +80,21 @@ def randomize_tables(tables: dict, people: list) -> dict:
                     pair = people.pop(0)
                 else:
                     pair = people.pop(0)[::-1]
+            for p in pair:
+                p.table = table
             tables[table].append(pair)
 
     return tables
 
 
-def add_friend(men: list, women: list, host: tuple) -> None:
+def add_friend(men: list, women: list, host: Person) -> None:
     print(f"Adding friend to {host}")
     friend = {x.name: x for x in men + women}.get(host.preference, "")
-    if type(friend) is str:
+    if type(friend) is str or host.sits_with_friend or friend.sits_with_friend:
         print("returning")
         return
-    print(friend)
+    host.sits_with_friend = True
+    friend.sits_with_friend = True
     if host.sex is friend.sex:
         if host.sex is 'm':
             swap_list = men
@@ -135,8 +123,6 @@ def add_friend(men: list, women: list, host: tuple) -> None:
          other_list[host_index]) = (other_list[host_index],
                                     other_list[friend_index])
 
-    print(men + women)
-
 
 if __name__ == '__main__':
     args = getArgs()
@@ -144,6 +130,7 @@ if __name__ == '__main__':
     names = args.column
     sexes = args.sexes
     preference = args.preference
+    allergies = args.allergies
 
     try:
         df = pd.read_csv(data)
@@ -153,13 +140,32 @@ if __name__ == '__main__':
     try:
         df['names'] = df[names]
         if sexes is not None:
-            df['sexes'] = df[sexes]  # define_sex(names, df[sexes])
-        else:
-            df['sexes'] = None  # TODO: define sexes
+            df['sexes'] = df[sexes]
         if preference is not None:
             df['preference'] = df[preference]
+        if allergies is not None:
+            df['allergies'] = df[allergies]
+        else:
+            df['allergies'] = [None for x in df['names']]
     except KeyError as ke:
         print(f"Could not find column {ke.args}, exiting")
         sys.exit()
     people = [Person(i, df) for i in range(len(df.index))]
-    print_tables(randomize_tables(get_tables(), people))
+    tables = randomize_tables(get_tables(), people)
+    while True:
+        outputstyle = input("""Choose output format:
+print_table -- print tables to console
+print_list -- print list of which person sits in which table
+print_allergies -- prints list of all peolpe with alleriges
+exit -- exit script
+
+ """)
+        if outputstyle == 'print_table':
+            print_tables(tables)
+        elif outputstyle == 'print_list':
+            print_person_table_list(tables)
+        elif outputstyle == 'print_allergies':
+            print_allergies(tables)
+        elif outputstyle == '' or outputstyle == 'exit':
+            print("Exiting...")
+            sys.exit()
