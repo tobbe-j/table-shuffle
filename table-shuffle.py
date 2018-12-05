@@ -9,7 +9,12 @@ from person import Person, Empty
 
 
 def getArgs(argvals=None):
-    parser = argparse.ArgumentParser(description='Seating order from csv')
+    parser = argparse.ArgumentParser(description="""Seating order from csv
+Requieres filename of csv-file with data. To run interactively use -i.
+Otherwise all columns must be specified with tags.
+""")
+    parser.add_argument('-i', '--interactive', help='Specify all the column'
+                        'values interactivly', action='store_true')
     parser.add_argument('file', help='The csv file to read from')
     parser.add_argument('-c', '--column',
                         help='Specify name of column with names',
@@ -23,6 +28,13 @@ def getArgs(argvals=None):
         return parser.parse_args(argvals)
     else:
         return parser.parse_args()
+
+
+def ask_args(args):
+    args.column = input("Column name for names: ")
+    args.sexes = input("Column name for sexes: ")
+    args.preference = input("Column name for preferences: ")
+    args.allergies = input("Column name for allergies: ")
 
 
 def get_tables():
@@ -76,12 +88,12 @@ def randomize_tables(tables: dict, people: list) -> dict:
     for table, size in tables.items():
         tables[table] = []
         for seat in range(size):
-            pair = ()
+            pair = []
             if len(people) is 0:
-                pair = (Empty(), Empty())
+                pair = list((Empty(), Empty()))
             else:
                 if seat % 2 is 0:
-                    pair = people.pop(0)
+                    pair = list(people.pop(0))
                 else:
                     pair = people.pop(0)[::-1]
             for p in pair:
@@ -128,8 +140,30 @@ def add_friend(men: list, women: list, host: Person) -> None:
                                     other_list[friend_index])
 
 
+def swap_places(tables: dict, a: str, b: str) -> None:
+    a_i = []
+    b_i = []
+    for name, table in tables.items():
+        for idx, pair in enumerate(table):
+            if pair[0].name == a:
+                a_i.extend([name, idx, 0])
+            if pair[1].name == a:
+                a_i.extend([name, idx, 1])
+            if pair[0].name == b:
+                b_i.extend([name, idx, 0])
+            if pair[1].name == b:
+                b_i.extend([name, idx, 1])
+    if len(a_i) + len(b_i) > 0:
+        (tables[a_i[0]][a_i[1]][a_i[2]],
+         tables[b_i[0]][b_i[1]][b_i[2]]) = (tables[b_i[0]][b_i[1]][b_i[2]],
+                                            tables[a_i[0]][a_i[1]][a_i[2]])
+
+
 if __name__ == '__main__':
     args = getArgs()
+    if args.interactive:
+        ask_args(args)
+    print(args.column)
     data = args.file
     names = args.column
     sexes = args.sexes
@@ -173,6 +207,10 @@ exit -- exit script
             print_allergies(tables)
         elif outputstyle == 'save_table':
             save_tables(tables)
+        elif outputstyle.split(" ")[0] == "swap":
+            _, name1, name2 = outputstyle.split(" ")
+            swap_places(tables, name1, name2)
+            print_tables(tables)
         elif outputstyle == '' or outputstyle == 'exit':
             print("Exiting...")
             sys.exit()
