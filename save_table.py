@@ -1,4 +1,5 @@
 from PIL import Image, ImageDraw, ImageFont
+from person import Person
 
 
 def save_tables(tables: dict) -> None:
@@ -18,14 +19,11 @@ def save_tables(tables: dict) -> None:
         dr.text((midlle_cord, 1000), name, (0, 0, 0), font=font)
 
         for idx, row in enumerate(table):
-            rotated_text = add_text(row[1].name, font)
+            rotated_text = add_text(row[1], font)
             img.paste(rotated_text, (180 + (idx * 90), 500), rotated_text)
-            rotated_text_pair = add_text(row[0].name, font, cc=True)
+            rotated_text_pair = add_text(row[0], font, cc=True)
             img.paste(rotated_text_pair,
                       (180 + (idx * 90), 1250), rotated_text_pair)
-
-#    rotated_text = add_text("test", font)
-#    img.paste(rotated_text, (200, 100), rotated_text)
 
     pdf_name = 'tables.pdf'
     print(f"Saving tables to {pdf_name}")
@@ -33,10 +31,24 @@ def save_tables(tables: dict) -> None:
     first_table.save(pdf_name, save_all=True, append_images=images[1:])
 
 
-def add_text(text: str, font, cc=False) -> Image:
+def add_text(person: Person, font, cc=False) -> Image:
     txt = Image.new('RGBA', (350, 50), (0, 0, 0, 0))
     d = ImageDraw.Draw(txt)
-    d.text((0, 0), text, (0, 0, 0), font=font)
+    if person.allergies is not None:
+        allerg = person.allergies.lower()
+        if 'glut' in allerg:
+            text_color = (204, 204, 0)
+        elif 'lakt' in allerg or 'mjölk' in allerg:
+            text_color = (30, 144, 255)
+        elif 'vege' in allerg:
+            text_color = (50, 205, 50)
+        elif 'vegan' in allerg:
+            text_color = (0, 100, 0)
+        else:
+            text_color = (255, 0, 0)
+    else:
+        text_color = (0, 0, 0)
+    d.text((0, 0), person.name, text_color, font=font)
     if cc:
         w = txt.rotate(290, expand=1)
     else:
