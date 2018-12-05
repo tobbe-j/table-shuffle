@@ -83,7 +83,7 @@ def randomize_tables(tables: dict, people: list) -> dict:
     random.shuffle(women)
     for person in people:
         if person.preference is not None:
-            add_friend(men, women, person)
+            add_friend(men, women, person, tables)
     people = list(zip_longest(men, women, fillvalue=Empty()))
     for table, size in tables.items():
         tables[table] = []
@@ -103,7 +103,7 @@ def randomize_tables(tables: dict, people: list) -> dict:
     return tables
 
 
-def add_friend(men: list, women: list, host: Person) -> None:
+def add_friend(men: list, women: list, host: Person, tables: dict) -> None:
     print(f"Adding friend to {host}")
     friend = {x.name: x for x in men + women}.get(host.preference, "")
     if type(friend) is str or host.sits_with_friend or friend.sits_with_friend:
@@ -112,13 +112,22 @@ def add_friend(men: list, women: list, host: Person) -> None:
     host.sits_with_friend = True
     friend.sits_with_friend = True
     if host.sex is friend.sex:
+        # Host and friend will sit diagonally opposite to each other
         if host.sex is 'm':
             swap_list = men
         else:
             swap_list = women
         host_index = swap_list.index(host)
         friend_index = swap_list.index(friend)
-        if host_index + 2 < len(swap_list):
+        # Checks that friend will not be slit at ends between two tables
+        i_sum = 0
+        will_be_split = False
+        for name, length in tables.items():
+            i_sum += length
+            if host_index + 1 is i_sum:
+                will_be_split = True
+
+        if host_index + 2 < len(swap_list) and not will_be_split:
             (swap_list[friend_index],
              swap_list[host_index + 1]) = (swap_list[host_index + 1],
                                            swap_list[friend_index])
@@ -127,6 +136,7 @@ def add_friend(men: list, women: list, host: Person) -> None:
              swap_list[host_index - 1]) = (swap_list[host_index - 1],
                                            swap_list[friend_index])
     else:
+        # Host and friend will sit opposite to each other
         if host.sex is 'm':
             host_list = men
             other_list = women
