@@ -56,6 +56,7 @@ def get_tables():
 
 
 def balance_sex(men: list, women: list):
+    print(len(men), ">-<", len(women))
     if len(men) > len(women):
         difference = (len(men) - len(women)) // 2
         for m in men[-difference:]:
@@ -63,12 +64,12 @@ def balance_sex(men: list, women: list):
         women.extend(men[-difference:])
         del men[-difference:]
     elif len(women) > len(men):
-        difference = len(women) - len(men) // 2
+        difference = (len(women) - len(men)) // 2
         for w in women[-difference:]:
             w.sex = 'm'
         men.extend(women[-difference:])
         del women[-difference:]
-    print(len(men), "  ", len(women))
+    print(len(men), "<->", len(women))
     return [men, women]
 
 
