@@ -1,4 +1,4 @@
 #### Packages reruired for table-shuffle ####
 argparse
 pandas
-PIL
+Pillow
