@@ -96,7 +96,7 @@ def randomize_tables(tables: dict, people: list) -> dict:
                 if seat % 2 is 0:
                     pair = list(people.pop(0))
                 else:
-                    pair = people.pop(0)[::-1]
+                    pair = list(people.pop(0)[::-1])
             for p in pair:
                 p.table = table
             tables[table].append(pair)
@@ -163,6 +163,7 @@ def swap_places(tables: dict, a: str, b: str) -> None:
                 b_i.extend([name, idx, 0])
             if pair[1].name == b:
                 b_i.extend([name, idx, 1])
+    print(tables)
     if len(a_i) + len(b_i) > 0:
         (tables[a_i[0]][a_i[1]][a_i[2]],
          tables[b_i[0]][b_i[1]][b_i[2]]) = (tables[b_i[0]][b_i[1]][b_i[2]],
