@@ -63,11 +63,12 @@ def balance_sex(men: list, women: list):
         women.extend(men[-difference:])
         del men[-difference:]
     elif len(women) > len(men):
-        difference = len(women) - len(men)
+        difference = len(women) - len(men) // 2
         for w in women[-difference:]:
             w.sex = 'm'
         men.extend(women[-difference:])
         del women[-difference:]
+    print(len(men), "  ", len(women))
     return [men, women]
 
 
@@ -104,10 +105,9 @@ def randomize_tables(tables: dict, people: list) -> dict:
 
 
 def add_friend(men: list, women: list, host: Person, tables: dict) -> None:
-    print(f"Adding friend to {host}")
+    print(f"Adding friend to {host.name}")
     friend = {x.name: x for x in men + women}.get(host.preference, "")
     if type(friend) is str or host.sits_with_friend or friend.sits_with_friend:
-        print("returning")
         return
     host.sits_with_friend = True
     friend.sits_with_friend = True
@@ -201,7 +201,10 @@ if __name__ == '__main__':
     people = [Person(i, df) for i in range(len(df.index))]
     tables = randomize_tables(get_tables(), people)
     while True:
-        outputstyle = input("""Choose output format:
+        outputstyle = input("""
+
+Choose action:
+swap NAME OTHER -- swap places for two people
 print_table -- print tables to console
 print_list -- print list of which person sits in which table
 print_allergies -- prints list of all peolpe with alleriges

@@ -7,7 +7,7 @@ Empty tables will be the same size and have the word empty on them
 
 def print_tables(tables: dict) -> None:
     for name, table in tables.items():
-        print(f"\n{' ' * 50}{name}\n\n")
+        print(f"\n{' ' * 55}{name}\n\n")
         if len(table[0][0].name) is 0:
             print("""                        +--------------+
                         |      E       |
