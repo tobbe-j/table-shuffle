@@ -4,6 +4,20 @@ This is a simple script for doing seating order for parties etc.
 
 It reads data from a csv-file with names and randomly shuffles them around tables of user defined count and size.
 
+## Installation
+Make sure you have python and pip installed.
+
+```
+# Clone this repo: 
+git clone https://github.com/tobbe-j/table-shuffle.git
+
+# Go into the directory:
+cd tabel-shuffle/
+
+# install python dependencies: 
+pip install -r requirements.txt
+```
+
 ## Usage
 The script needs the filename of the csv-file and also the names of the columns with the data.
 The script can either be used by supplying all the required column names with their appropriate flag or by using the `-i` interactive flag to input the column names interactively.
@@ -37,5 +51,7 @@ print_table -- print tables to console
 print_list -- print list of which person sits in which table
 print_allergies -- prints list of all peolpe with alleriges
 save_table -- save tables as a pdf
+save_allergy_table -- same as save table but people with allergies will have
+                      colored names
 exit -- exit script
 ```
