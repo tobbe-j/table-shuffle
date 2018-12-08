@@ -209,6 +209,8 @@ print_table -- print tables to console
 print_list -- print list of which person sits in which table
 print_allergies -- prints list of all peolpe with alleriges
 save_table -- save tables as a pdf
+save_allergy_table -- same as save table but people with allergies will have
+                      colored names
 exit -- exit script
 
  """)
@@ -220,6 +222,8 @@ exit -- exit script
             print_allergies(tables)
         elif outputstyle == 'save_table':
             save_tables(tables)
+        elif outputstyle == 'save_allergy_table':
+            save_tables(tables, allergies=True)
         elif outputstyle.split(" ")[0] == "swap":
             _, name1, name2 = outputstyle.split(" ")
             swap_places(tables, name1, name2)
