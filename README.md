@@ -69,3 +69,5 @@ to be checked manually.
 
 The maximum table size is 30 - otherwise the table will not fit on one page
 when saved.
+
+If the script does not find a font to use, (Roboto or Open Sans for linux, Helvetica for Windows and OS X), it will default to a minimal font which is barely readable.
