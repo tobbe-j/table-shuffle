@@ -1,10 +1,29 @@
+"""Functions for saving a seating order to pdf.
+
+Functions for saving a seating order to pdf in different ways.
+All the functions take a dict as param, which has the table names as
+keys and lists of pairs of people as values.
+
+Uses the Pillow library to create images which are then saved as pdf.
+"""
+
+
+import sys
+import os
 from PIL import Image, ImageDraw, ImageFont
 from person import Person
 
 
 def save_tables(tables: dict, allergies=False) -> None:
-    font = ImageFont.truetype("/usr/share/fonts/TTF/Roboto-Light.ttf", 40)
+    """Save the tables as a pdf.
 
+    Create an image of the tables with the names of the people at the table.
+    If the allergies argument is True, color the names according to their
+    allergies and create a legend for the colors with the name of
+    corresponding allergies. Then saves the image as a pdf.
+    """
+
+    font = load_font()
     images = []
 
     for name, table in tables.items():
@@ -45,6 +64,8 @@ def save_tables(tables: dict, allergies=False) -> None:
 
 
 def add_text(person: Person, font, color, cc=False) -> Image:
+    """Return an image with the name of the parson rotated."""
+
     txt = Image.new('RGBA', (350, 50), (0, 0, 0, 0))
     d = ImageDraw.Draw(txt)
     d.text((0, 0), person.name, color, font=font)
@@ -56,8 +77,15 @@ def add_text(person: Person, font, color, cc=False) -> Image:
 
 
 def save_list(tables: dict, allergies=False) -> None:
-    font = ImageFont.truetype("/usr/share/fonts/TTF/Roboto-Light.ttf", 40)
+    """Save a list of people as pdf.
 
+    Save a list of people as a pdf.
+    With allergies set to fale the list contains names and tables of every
+    person in alphabetical order, with allergies set to true the list only
+    contains people with allergies and also lists their allergies.
+    """
+
+    font = load_font()
     images = []
     person_idx = 0
     p_per_page = 55
@@ -92,6 +120,7 @@ def save_list(tables: dict, allergies=False) -> None:
 
 
 def add_allergy(person: Person, allergy_table: dict) -> tuple:
+    """Add allergy to dict and return color based on allery."""
     if person.allergies is not None:
         allerg = person.allergies.lower()
         if len(allerg.split(" ")) > 2:
@@ -120,3 +149,22 @@ def add_allergy(person: Person, allergy_table: dict) -> tuple:
             return (255, 69, 0)
     else:
         return (0, 0, 0)
+
+
+def load_font():
+    """Load a font based on operating system."""
+
+    if sys.platform.startswith('linux'):
+        path = "/usr/share/fonts/TTF/Roboto-Light.ttf"
+        if not os.path.isfile(path):
+            path = "/usr/share/fonts/TTF/OpenSans-Light.ttf"
+    elif sys.platform.startswith('win') or sys.platform.startswith('cygwin'):
+        path = os.path.join(os.environ['WINDIR'], 'Fonts/Helvetica.ttf')
+    elif sys.platform.startswith('darwin'):
+        path = "System/Library/Fonts/Helvetica.ttf"
+
+    try:
+        return ImageFont.truetype(path, 40)
+    except IOError:
+        print(f"WARNING: Could not find font at {path}\n")
+        return ImageFont.load_default()

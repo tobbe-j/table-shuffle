@@ -1,11 +1,13 @@
-"""
-Prints the tables in terminal
+"""Functions for displaying data from seating order tables in the terminal.
 
-Empty tables will be the same size and have the word empty on them
+Different functions for printing data from a dict of tables in the terminal
+All the functions take a dict as param, which has the table names as
+keys and lists of pairs of people as values.
 """
 
 
 def print_tables(tables: dict) -> None:
+    """Print the tables with peoples names and allergies."""
     for name, table in tables.items():
         print(f"\n{' ' * 55}{name}\n\n")
         if len(table[0][0].name) is 0:
@@ -57,6 +59,12 @@ def print_tables(tables: dict) -> None:
 
 
 def print_person_table_list(tables: dict) -> None:
+    """Print a list  of all the people and their table name.
+
+    Print a list in alphabetical order by surname of all the people displaying
+    name and table name for everyone.
+    """
+
     people = []
     for name, table in tables.items():
         for pair in table:
@@ -70,11 +78,13 @@ def print_person_table_list(tables: dict) -> None:
 
 
 def print_allergies(tables: dict) -> None:
+    """Print a list of all the people with their allergies."""
+
     people = []
     for name, table in tables.items():
         for pair in table:
             people.extend(pair)
-    people.sort(key=lambda x: x.name)
+    people.sort(key=lambda x: x.name.split(" ")[-1])
     print(f"\n\n\nPERSON -- TABLE -- ALLERGIES\n")
     for person in people:
         if person.name is not " " and person.allergies is not None:

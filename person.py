@@ -3,6 +3,15 @@ import readchar
 
 
 class Person:
+    """Represents a person with attributes describing the person.
+
+    Params:
+    name -- Name of person
+    sex -- Sex represented as 'm' or 'w'
+    preference -- avec or seating preference, name of another person
+    allergies -- string of all the allergies of this person
+    """
+
     def __init__(self, idx, df, interactive=True):
         try:
             self.name = df['names'][idx]
@@ -17,6 +26,11 @@ class Person:
             sys.exit()
 
     def define_sex(self, df, idx):
+        """Saves the sex of this person.
+
+        Saves the sex of this person either by taking it from the the param df
+        or by getting it from stdin
+        """
         try:
             return df['sexes'][idx]
         except KeyError:
@@ -36,6 +50,8 @@ class Person:
 
 
 class Empty(Person):
+    """Subclass from Person representing empty an place"""
+
     def __init__(self):
         self.name = " "
         self.sex = " "

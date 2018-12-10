@@ -9,6 +9,8 @@ from person import Person, Empty
 
 
 def getArgs(argvals=None):
+    """Parse the arguments from the commandline or optionally  from param"""
+
     parser = argparse.ArgumentParser(description="""Seating order from csv
 Requieres filename of csv-file with data. To run interactively use -i.
 Otherwise all columns must be specified with tags.
@@ -31,6 +33,8 @@ Otherwise all columns must be specified with tags.
 
 
 def ask_args(args):
+    """Get args from stdin and add as attributes to param"""
+
     args.column = input("Column name for names: ")
     args.sexes = input("Column name for sexes: ")
     args.preference = input("Column name for preferences: ")
@@ -38,6 +42,8 @@ def ask_args(args):
 
 
 def get_tables():
+    """Get table count, names and sizes from stdin and return as dict"""
+
     print('Setting up table count and sizes:')
     nr_tables = 0
     while (nr_tables <= 0):
@@ -53,19 +59,20 @@ def get_tables():
         while type(name) is not str or len(name) <= 0:
             name = input("Name for this table? ")
         size = 0
-        while(size <= 0):
+        while(size <= 1):
             try:
                 size = int(input(f"How long is table nr {table + 1}? "))
             except ValueError:
                 pass
         if size > 30:
-            print("Warning: maximum table size supported is 30")
+            print("\n\nWARNING: maximum table size supported is 30\n\n")
         tables[name] = size
     return tables
 
 
 def balance_sex(men: list, women: list):
-    print(len(men), ">-<", len(women))
+    """Even out th two lists to equal size and return them"""
+
     if len(men) > len(women):
         difference = (len(men) - len(women)) // 2
         for m in men[-difference:]:
@@ -78,11 +85,29 @@ def balance_sex(men: list, women: list):
             w.sex = 'm'
         men.extend(women[-difference:])
         del women[-difference:]
-    print(len(men), "<->", len(women))
     return [men, women]
 
 
 def randomize_tables(tables: dict, people: list) -> dict:
+    """Create random table with the Objects from person.
+
+    Create a random table with the Objects from person. First splits the people
+    based on sex, then balance them to have eqaul amount of men and women.
+    Then shuffle the lists and place the people on tables according to the data
+    from the tables dict.
+
+    Returns a dict with the table names as keys and lists of all the people in
+    pairs for each table.
+
+    Arguments:
+    tables -- A dict with the names of the tables as keys and sizes of hte
+    tables as values
+    people -- a list of the people to be added to the tables
+    """
+
+    if sum(tables.values()) < len(people):
+        print("\n\nWARNING: You have more names than space at the tables, some"
+              " people will get dropped!\n\n")
     men, women = [], []
     for item in people:
         (men if item.sex is 'm' else women).append(item)
@@ -115,9 +140,13 @@ def randomize_tables(tables: dict, people: list) -> dict:
 
 
 def add_friend(men: list, women: list, host: Person, tables: dict) -> None:
+    """Move the avec of the host close to the host"""
+
     print(f"Adding friend to {host.name}")
     friend = {x.name: x for x in men + women}.get(host.preference, "")
     if type(friend) is str or host.sits_with_friend or friend.sits_with_friend:
+        print(f"Warning: {host.name} or {friend.name} already sits with a"
+              f"friend, you need to edit this manually.")
         return
     host.sits_with_friend = True
     friend.sits_with_friend = True
@@ -161,6 +190,8 @@ def add_friend(men: list, women: list, host: Person, tables: dict) -> None:
 
 
 def swap_places(tables: dict, a: str, b: str) -> None:
+    """Swap places of two people based on their names"""
+
     a_i = []
     b_i = []
     for name, table in tables.items():
@@ -183,7 +214,6 @@ if __name__ == '__main__':
     args = getArgs()
     if args.interactive:
         ask_args(args)
-    print(args.column)
     data = args.file
     names = args.column
     sexes = args.sexes
@@ -201,12 +231,14 @@ if __name__ == '__main__':
             df['sexes'] = df[sexes]
         if preference is not None:
             df['preference'] = df[preference]
+        else:
+            df['preference'] = [None for x in df['names']]
         if allergies is not None:
             df['allergies'] = df[allergies]
         else:
             df['allergies'] = [None for x in df['names']]
     except KeyError as ke:
-        print(f"Could not find column {ke.args}, exiting")
+        print(f"Could not find column {ke.args[0]}, exiting")
         sys.exit()
     people = [Person(i, df) for i in range(len(df.index))]
     tables = randomize_tables(get_tables(), people)
