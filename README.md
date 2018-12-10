@@ -41,9 +41,9 @@ Example:
 You then need to specify table count and names and sizes for all tables. The tables will be filled as far aspossible with all people available and then be empty at the end.
 
 ## Output formats
-The script currently supports outputting the result in different forms in the terminal, and also saving a version of the tables with everyone in their right places. The saved version also supports coloring peoples names accoring to their allergies.
+The script currently supports outputting the result in different forms in the terminal for viewing and editing the seating order. When the order is ready it can be saves as a pdf in a couple of different ways. It can be saved as tables with or without coloring of peoples names o show alleriges. It can also be saved as a alphabetically ordered list of all people showing which table they sit in. A list with all people with allergies can also be saved. 
 
-You can alos manually swap places for two people if you have requirements where some people need to sit.
+You can also manually swap places for two people if you have requirements where some people need to sit.
 ```
 Choose action:
 swap NAME OTHER -- swap places for two people
@@ -53,5 +53,19 @@ print_allergies -- prints list of all peolpe with alleriges
 save_table -- save tables as a pdf
 save_allergy_table -- same as save table but people with allergies will have
                       colored names
+save_list -- save a list of all people and which table they sit in
+save_allergy_list -- save a list of all people with allergies
 exit -- exit script
 ```
+### Limitations
+There are some limitations for how people can be seated.
+
+The script can only automatically add one avec per person. If many people form
+an avec-chain it will also fail. The rest of the preferences need to be added
+manually (using the swap command).
+
+The script has a hard time coloring people with multiple allergies, those need
+to be checked manually.
+
+The maximum table size is 30 - otherwise the table will not fit on one page
+when saved.

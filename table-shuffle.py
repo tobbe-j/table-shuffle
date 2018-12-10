@@ -58,7 +58,9 @@ def get_tables():
                 size = int(input(f"How long is table nr {table + 1}? "))
             except ValueError:
                 pass
-            tables[name] = size
+        if size > 30:
+            print("Warning: maximum table size supported is 30")
+        tables[name] = size
     return tables
 
 
