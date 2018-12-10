@@ -14,7 +14,7 @@ def save_tables(tables: dict, allergies=False) -> None:
 
         dr.rectangle([135, 950, (135 + 90 * len(table)), 1150],
                      fill=(211, 211, 211), outline='black',
-                     width=2)
+                     width=5)
         midlle_cord = ((135 + 90 * len(table)) - 135) // 2
         dr.text((midlle_cord, 1020), name.upper(), (0, 0, 0), font=font)
         allergy_table = {}
@@ -55,6 +55,42 @@ def add_text(person: Person, font, color, cc=False) -> Image:
     return w
 
 
+def save_list(tables: dict, allergies=False) -> None:
+    font = ImageFont.truetype("/usr/share/fonts/TTF/Roboto-Light.ttf", 40)
+
+    images = []
+    person_idx = 0
+    p_per_page = 55
+    people = [p for t in tables.values() for pa in t for p in pa]
+    people.sort(key=lambda x: x.name.split(" ")[-1])
+    for person in people:
+        if person.name == ' ':
+            continue
+        if person.allergies is None and allergies:
+            continue
+        if person_idx % p_per_page == 0:
+            img = Image.new('RGB', (2100, 2970), color='white')
+            dr = ImageDraw.Draw(img)
+            images.append(img)
+            headers = f"NAME{' ' * 35}TABLE"
+            dr.text((30, 30), headers, (0, 0, 0),  font=font)
+            if allergies:
+                dr.text((800, 30), "ALLERGIES", (0, 0, 0), font=font)
+        dr.text((30, (80 + 50 * (person_idx % p_per_page))),
+                person.name, (0, 0, 0), font=font)
+        dr.text((500, (80 + 50 * (person_idx % p_per_page))),
+                person.table, (0, 0, 0), font=font)
+        if person.allergies is not None and allergies:
+            dr.text((800, (80 + 50 * (person_idx % p_per_page))),
+                    person.allergies, (0, 0, 0), font=font)
+        person_idx += 1
+
+    pdf_name = 'list.pdf'
+    print(f"Saving tables to {pdf_name}")
+    first_table = images[0]
+    first_table.save(pdf_name, save_all=True, append_images=images[1:])
+
+
 def add_allergy(person: Person, allergy_table: dict) -> tuple:
     if person.allergies is not None:
         allerg = person.allergies.lower()
@@ -64,10 +100,10 @@ def add_allergy(person: Person, allergy_table: dict) -> tuple:
         if 'glut' in allerg:
             allergy_table['glutenfree'] = (204, 204, 0)
             return (204, 204, 0)
-        elif 'lakt' in allerg:
+        elif 'lakt' in allerg or 'lact' in allerg:
             allergy_table['lactosefree'] = (30, 144, 255)
             return (30, 144, 255)
-        elif 'mjölk' in allerg:
+        elif 'mjölk' in allerg or 'milk' in allerg:
             allergy_table['milkfree'] = (0, 0, 139)
             return (0, 0, 139)
         elif 'vege' in allerg:

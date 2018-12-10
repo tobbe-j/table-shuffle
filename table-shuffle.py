@@ -3,7 +3,7 @@ import sys
 import random
 import pandas as pd
 from itertools import zip_longest
-from save_table import save_tables
+from save_table import save_tables, save_list
 from print_tables import print_tables, print_person_table_list, print_allergies
 from person import Person, Empty
 
@@ -40,8 +40,12 @@ def ask_args(args):
 def get_tables():
     print('Setting up table count and sizes:')
     nr_tables = 0
-    while (type(nr_tables) is not int or nr_tables <= 0):
-        nr_tables = int(input("How many tables? "))
+    while (nr_tables <= 0):
+        try:
+            nr_tables = int(input("How many tables? "))
+        except ValueError:
+            pass
+    nr_tables = nr_tables
 
     tables = {}
     for table in range(nr_tables):
@@ -49,8 +53,11 @@ def get_tables():
         while type(name) is not str or len(name) <= 0:
             name = input("Name for this table? ")
         size = 0
-        while(type(size) is not int or size <= 0):
-            size = int(input(f"How long is table nr {table + 1}? "))
+        while(size <= 0):
+            try:
+                size = int(input(f"How long is table nr {table + 1}? "))
+            except ValueError:
+                pass
             tables[name] = size
     return tables
 
@@ -164,7 +171,6 @@ def swap_places(tables: dict, a: str, b: str) -> None:
                 b_i.extend([name, idx, 0])
             if pair[1].name == b:
                 b_i.extend([name, idx, 1])
-    print(tables)
     if len(a_i) + len(b_i) > 0:
         (tables[a_i[0]][a_i[1]][a_i[2]],
          tables[b_i[0]][b_i[1]][b_i[2]]) = (tables[b_i[0]][b_i[1]][b_i[2]],
@@ -213,6 +219,8 @@ print_allergies -- prints list of all peolpe with alleriges
 save_table -- save tables as a pdf
 save_allergy_table -- same as save table but people with allergies will have
                       colored names
+save_list -- save a list of all people and which table they sit in
+save_allergy_list -- save a list of all people with allergies
 exit -- exit script
 
  """)
@@ -226,6 +234,10 @@ exit -- exit script
             save_tables(tables)
         elif outputstyle == 'save_allergy_table':
             save_tables(tables, allergies=True)
+        elif outputstyle == 'save_list':
+            save_list(tables)
+        elif outputstyle == 'save_allergy_list':
+            save_list(tables, allergies=True)
         elif outputstyle.split(" ")[0] == "swap":
             _, name1, name2 = outputstyle.split(" ")
             swap_places(tables, name1, name2)
