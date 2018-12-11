@@ -14,6 +14,21 @@ from PIL import Image, ImageDraw, ImageFont
 from person import Person
 
 
+def save_as_pdf(file_name='table'):
+    """Save the file that is returned as a pdf."""
+    def decorator_func(func):
+        def decorator(*args, **kwargs):
+            image_list = func(*args, **kwargs)
+            pdf_name = f'{file_name}.pdf'
+            print(f"Saving tables to {pdf_name}")
+            first_table = image_list[0]
+            first_table.save(pdf_name, save_all=True,
+                             append_images=image_list[1:])
+        return decorator
+    return decorator_func
+
+
+@save_as_pdf(file_name='tables')
 def save_tables(tables: dict, allergies=False) -> None:
     """Save the tables as a pdf.
 
@@ -57,10 +72,7 @@ def save_tables(tables: dict, allergies=False) -> None:
         for allerg, color in allergy_table.items():
             dr.text((20, x_cord), allerg, color, font=font)
             x_cord += 50
-    pdf_name = 'tables.pdf'
-    print(f"Saving tables to {pdf_name}")
-    first_table = images[0]
-    first_table.save(pdf_name, save_all=True, append_images=images[1:])
+    return images
 
 
 def add_text(person: Person, font, color, cc=False) -> Image:
@@ -76,6 +88,7 @@ def add_text(person: Person, font, color, cc=False) -> Image:
     return w
 
 
+@save_as_pdf(file_name='list')
 def save_list(tables: dict, allergies=False) -> None:
     """Save a list of people as pdf.
 
@@ -113,10 +126,7 @@ def save_list(tables: dict, allergies=False) -> None:
                     person.allergies, (0, 0, 0), font=font)
         person_idx += 1
 
-    pdf_name = 'list.pdf'
-    print(f"Saving tables to {pdf_name}")
-    first_table = images[0]
-    first_table.save(pdf_name, save_all=True, append_images=images[1:])
+    return images
 
 
 def add_allergy(person: Person, allergy_table: dict) -> tuple:
